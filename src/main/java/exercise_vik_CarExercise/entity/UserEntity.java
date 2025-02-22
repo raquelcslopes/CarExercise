@@ -1,9 +1,12 @@
 package exercise_vik_CarExercise.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Entity(name = "users")
 @Table
 public class UserEntity {
@@ -22,11 +25,28 @@ public class UserEntity {
 
     @Column(name = "NIF", unique = true)
     private String nif;
-
     @OneToMany(
             mappedBy = "user"
     )
     private List<VehicleEntity> vehicles;
+
+    public UserEntity(Long id, boolean isActive, String firstName, String lastName, String nif, List<VehicleEntity> vehicles) {
+        this.id = id;
+        this.isActive = isActive;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.nif = nif;
+        this.vehicles = vehicles;
+    }
+
+    public UserEntity() {
+        this.id = 0L;
+        this.isActive = false;
+        this.firstName = " ";
+        this.lastName = "";
+        this.nif = "";
+        this.vehicles = new ArrayList<>();
+    }
 
     public String getNif() {
         return nif;

@@ -60,4 +60,11 @@ public class VehicleController {
         }
         return ResponseEntity.ok(null);
     }
+
+//    @GetMapping(path = "confusing")
+//    public ResponseEntity<?> getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser() {
+//        List<VehicleDTO> vehicleDTOS = new ArrayList<>();
+//        vehicleDTOS = vehicleService.getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser();
+//        return ResponseEntity.ok(vehicleDTOS);
+//    }
 }

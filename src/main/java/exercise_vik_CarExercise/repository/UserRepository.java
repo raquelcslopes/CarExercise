@@ -12,8 +12,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByNif(String nif);
 
-    List<UserEntity> findByIsActive(boolean active);
+    Optional<List<UserEntity>> findByIsActive(boolean active);
 
-//    List<UserEntity> findByFirstNameAndLastNameAndIsActive(boolean active);
+    //List<UserEntity> findByFirstNameAndLastName();
+
 
 }

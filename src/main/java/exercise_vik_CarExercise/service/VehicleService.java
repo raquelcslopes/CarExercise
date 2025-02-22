@@ -77,4 +77,15 @@ public class VehicleService {
         vehicles.get().setActive(false);
         vehicleRepo.save(vehicles.get());
     }
+
+
+//    public List<UserDTO> getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser() {
+//        Optional<List<UserEntity>> deativetedEntities = userRepo.findByIsActive(false);
+//
+//        Optional<List<VehicleEntity>> activeVehicles = vehicleRepo.findByVehicleIn(deativetedEntities);
+//
+//        List<VehicleEntity> u = activeVehicles.get().stream()
+//                .filter(ve -> ve.isActive())
+//                .map(ve.> plate != null)
+//    }
 }

@@ -1,35 +1,34 @@
 package exercise_vik_CarExercise.service;
 
 import exercise_vik_CarExercise.entity.UserEntity;
+import exercise_vik_CarExercise.entity.VehicleEntity;
 import exercise_vik_CarExercise.exceptions.AccountDoesNotExistException;
 import exercise_vik_CarExercise.exceptions.AlreadyExistsException;
+import exercise_vik_CarExercise.model.UserConverter;
 import exercise_vik_CarExercise.model.UserDTO;
 import exercise_vik_CarExercise.repository.UserRepository;
+import exercise_vik_CarExercise.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     @Autowired
     UserRepository userRepo;
-
+    @Autowired
+    VehicleRepository vehicleRepo;
 
     public UserDTO createAccount(UserDTO dto) {
-        UserEntity entity = new UserEntity();
-
         Optional<UserEntity> user = userRepo.findByNif(dto.getNif());
 
         if (user.isPresent()) {
             throw new AlreadyExistsException("existent!");
         }
-        entity.setActive(dto.getActive());
-        entity.setFirstName(dto.getFirstName());
-        entity.setLastName(dto.getLastName());
-        entity.setNif(dto.getNif());
+        UserEntity entity = UserConverter.fromUserDtoToUserEntity(dto);
 
         //inform the id
         UserEntity saved = userRepo.save(entity);
@@ -38,18 +37,13 @@ public class UserService {
         return dto;
     }
 
-    public void activateAccount(Long id) throws AccountDoesNotExistException {
-        Optional<UserEntity> user = userRepo.findById(id);
+    public void activateAccount(Long id) {
+        UserEntity user = this.userRepo.findById(id)
+                .orElseThrow(() -> new AccountDoesNotExistException("User with ID " + id + " does not exist!"));
 
-        if (user.isEmpty()) {
-            throw new AccountDoesNotExistException("inexistent user!");
-        }
-
-        UserEntity u = user.get();
-
-        if (!u.isActive()) {
-            u.setActive(true);
-            userRepo.save(u);
+        if (!user.isActive()) {
+            user.setActive(true);
+            this.userRepo.save(user);
         }
     }
 
@@ -89,40 +83,69 @@ public class UserService {
         userRepo.save(user.get());
     }
 
-    public void updateFullAcccountDetails(Long id, UserDTO dto) throws AccountDoesNotExistException {
+    public void updateFullAccountDetails(Long id, UserDTO dto) throws AccountDoesNotExistException {
         Optional<UserEntity> user = userRepo.findById(id);
 
         if (user.isEmpty()) {
             throw new AccountDoesNotExistException("Account does not exist");
         }
 
-        user.get().setLastName(dto.getLastName());
-        user.get().setFirstName(dto.getFirstName());
-        user.get().setActive(dto.getActive());
-        user.get().setNif(dto.getNif());
+        UserEntity users = user.get();
 
-        userRepo.save(user.get());
+        UserConverter.fromUserEntityToUserDto(users);
+
+        userRepo.save(users);
     }
 
-    public List<UserEntity> getDeactivatedAccounts() throws AccountDoesNotExistException {
-        List<UserEntity> users = userRepo.findByIsActive(false);
+    public List<UserDTO> getDeactivatedAccounts() throws AccountDoesNotExistException {
+        Optional<List<UserEntity>> users = userRepo.findByIsActive(false);
 
         if (users.isEmpty()) {
             throw new AccountDoesNotExistException("There is no accounts deativated");
         }
 
-        return users;
+        List<UserDTO> userDTO = new ArrayList<>();
+        for (UserEntity userEntity : users.get()) {
+            userDTO.add(UserConverter.fromUserEntityToUserDto(userEntity));
+        }
+        return userDTO;
     }
 
-//    public List<UserEntity> getFirstNameAndLastNameAccountsThatAreDeactivated() throws AccountDoesNotExistException {
-//        List<UserEntity> users = userRepo.findByFirstNameAndLastNameAndIsActive(false);
-//
-//        if (users.isEmpty()) {
-//            throw new AccountDoesNotExistException("There is no accounts deativated");
-//        }
-//
-//        return users;
-//    }
+    public List<UserDTO> getDeactivatedAccountsWithActiveVehicles() {
+        Optional<List<UserEntity>> usersDeactivatedEntities = userRepo.findByIsActive(false);
+
+        Optional<List<VehicleEntity>> vehicleEntities = vehicleRepo.findByUserIn(usersDeactivatedEntities);
+
+        if (vehicleEntities.isPresent()) {
+       /* List<VehicleEntity> activeVehicles = vehicleEntities.get().stream()
+                    .filter(ve -> ve.isActive())
+                    .collect(Collectors.toList());*/
+
+            List<UserDTO> userDeactiveVehicleActive = vehicleEntities.get().stream()
+                    .filter(ve -> ve.isActive())
+                    .map(ve -> UserConverter.fromUserEntityToUserDto(ve.getUser()))
+                    .collect(Collectors.toList());
+
+            return userDeactiveVehicleActive;
+        }
+        return Collections.emptyList();
+    }
 
 
+    public List<UserDTO> getFirstNameAndLastNameAccountsThatAreDeactivated() {
+        List<UserEntity> users = userRepo.findAll();
+
+        List<UserDTO> dtos = new ArrayList<>();
+
+        Iterator<UserEntity> iterator = users.iterator();
+
+        for (UserEntity entity : users) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setLastName(entity.getLastName());
+            userDTO.setFirstName(entity.getFirstName());
+
+            dtos.add(userDTO);
+        }
+        return dtos;
+    }
 }

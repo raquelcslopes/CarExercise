@@ -1,12 +1,20 @@
 package exercise_vik_CarExercise.repository;
 
+import exercise_vik_CarExercise.entity.UserEntity;
 import exercise_vik_CarExercise.entity.VehicleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<VehicleEntity, Long> {
     Optional<VehicleEntity> findByPlate(String plate);
+
+    Optional<List<VehicleEntity>> findByUserIn(Optional<List<UserEntity>> users);
+
+    //Optional<List<VehicleEntity>> findByVehicleIn(Optional<List<UserEntity>> users);
+
+
 }
