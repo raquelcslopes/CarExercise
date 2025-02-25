@@ -5,11 +5,13 @@ import exercise_vik_CarExercise.entity.VehicleEntity;
 import exercise_vik_CarExercise.exceptions.AccountDoesNotExistException;
 import exercise_vik_CarExercise.exceptions.VehicleAlreadyExistException;
 import exercise_vik_CarExercise.exceptions.VehicleDoesNotExists;
+import exercise_vik_CarExercise.model.VehicleConverter;
 import exercise_vik_CarExercise.model.VehicleDTO;
 import exercise_vik_CarExercise.repository.UserRepository;
 import exercise_vik_CarExercise.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,11 +32,9 @@ public class VehicleService {
             throw new VehicleAlreadyExistException("This vehicle already exists");
         }
 
-        VehicleEntity vehicles = new VehicleEntity();
-        vehicles.setActive(dto.getActive());
-        vehicles.setPlate(dto.getPlate());
+        VehicleEntity vehicleEntity = VehicleConverter.fromVehicleDtoToVehicleEntity(dto);
 
-        vehicleRepo.save(vehicles);
+        vehicleRepo.save(vehicleEntity);
     }
 
     public void associateVehicleToAccount(Long userId, Long vehicleId) throws VehicleDoesNotExists, AccountDoesNotExistException {
@@ -51,11 +51,9 @@ public class VehicleService {
         }
 
         VehicleEntity vehicle = vehicles.get();
-        if (users.isPresent()) {
-            UserEntity user = users.get();
-            vehicle.setUser(user);
-            vehicleRepo.save(vehicle);
-        }
+        UserEntity user = users.get();
+        vehicle.setUser(user);
+        vehicleRepo.save(vehicle);
     }
 
     public void activateVehicle(Long id) throws VehicleDoesNotExists {
@@ -64,8 +62,14 @@ public class VehicleService {
         if (vehicles.isEmpty()) {
             throw new VehicleDoesNotExists("Vehicle does not exist");
         }
-        vehicles.get().setActive(true);
-        vehicleRepo.save(vehicles.get());
+
+        VehicleEntity vehicle = vehicles.get();
+
+        if (!vehicle.isActive()) {
+            vehicle.setActive(true);
+
+            vehicleRepo.save(vehicle);
+        }
     }
 
     public void deactivateVehicle(Long id) throws VehicleDoesNotExists {
@@ -74,18 +78,25 @@ public class VehicleService {
         if (vehicles.isEmpty()) {
             throw new VehicleDoesNotExists("Vehicle does not exist");
         }
-        vehicles.get().setActive(false);
-        vehicleRepo.save(vehicles.get());
+        VehicleEntity vehicle = vehicles.get();
+
+        if (vehicle.isActive()) {
+            vehicle.setActive(false);
+            vehicleRepo.save(vehicle);
+        }
     }
 
 
-//    public List<UserDTO> getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser() {
-//        Optional<List<UserEntity>> deativetedEntities = userRepo.findByIsActive(false);
-//
-//        Optional<List<VehicleEntity>> activeVehicles = vehicleRepo.findByVehicleIn(deativetedEntities);
-//
-//        List<VehicleEntity> u = activeVehicles.get().stream()
-//                .filter(ve -> ve.isActive())
-//                .map(ve.> plate != null)
-//    }
+    public String getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser() {
+        Optional<List<UserEntity>> deactivatedEntities = userRepo.findByIsActive(false);
+
+        Optional<List<VehicleEntity>> vehiclesWithDeactivatedUsers = vehicleRepo.findByUserIn(deactivatedEntities);
+
+        String u = vehiclesWithDeactivatedUsers.get().stream()
+                .filter(vehicle -> vehicle.isActive())
+                .map(vehicle -> vehicle.getPlate())
+                .toList().toString();
+
+        return u;
+    }
 }

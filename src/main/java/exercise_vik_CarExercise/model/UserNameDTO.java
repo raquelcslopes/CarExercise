@@ -10,9 +10,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class VehicleDTO {
-    public Boolean active;
+public class UserNameDTO {
 
-    @NotBlank(message = "Must have license plate")
-    public String plate;
+    @NotBlank(message = "Must have first name")
+    public String firstName;
+
+    @NotBlank(message = "Must have last name")
+    public String lastName;
 }

@@ -1,6 +1,9 @@
 package exercise_vik_CarExercise.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Builder
@@ -10,49 +13,18 @@ import lombok.*;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private Boolean active;
-    private String nif;
+    public Long id;
 
-    public String getNif() {
-        return nif;
-    }
+    @NotBlank(message = "Must have first name")
+    public String firstName;
 
-    public void setNif(String nif) {
-        this.nif = nif;
-    }
+    @NotBlank(message = "Must have last name")
+    public String lastName;
 
-    public String getFirstName() {
-        return firstName;
-    }
+    public Boolean active;
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @NotBlank(message = "Must have nif")
+    @Pattern(regexp = "^(0|[1-9][0-9]*)$", message = "Must have valid characters (numbers)")
+    @Size(min = 9, max = 9)
+    public String nif;
 }

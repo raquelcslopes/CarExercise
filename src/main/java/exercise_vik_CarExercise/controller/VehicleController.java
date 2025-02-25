@@ -5,10 +5,13 @@ import exercise_vik_CarExercise.exceptions.VehicleAlreadyExistException;
 import exercise_vik_CarExercise.exceptions.VehicleDoesNotExists;
 import exercise_vik_CarExercise.model.VehicleDTO;
 import exercise_vik_CarExercise.service.VehicleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("api/v1/vehicle")
@@ -16,9 +19,12 @@ public class VehicleController {
     @Autowired
     VehicleService vehicleService;
 
-
+    //DONE
     @PostMapping
-    public ResponseEntity<?> createVehicle(@RequestBody VehicleDTO dto) {
+    public ResponseEntity<?> createVehicle(@Valid @RequestBody VehicleDTO dto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         try {
             this.vehicleService.createVehicle(dto);
         } catch (VehicleAlreadyExistException e) {
@@ -28,43 +34,47 @@ public class VehicleController {
         return ResponseEntity.status(HttpStatus.OK).body("Car created");
     }
 
+    //DONE
     @PutMapping(path = "{userId}/associate/account/{vehicleId}")
     public ResponseEntity<?> associateVehicleToAccount(@PathVariable Long userId, @PathVariable Long vehicleId) {
         try {
             vehicleService.associateVehicleToAccount(userId, vehicleId);
         } catch (VehicleDoesNotExists | AccountDoesNotExistException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
         }
         return ResponseEntity.ok(null);
     }
 
+    //DONE
     @PutMapping(path = "{id}")
     public ResponseEntity<?> activateVehicle(@PathVariable Long id) {
         try {
             vehicleService.activateVehicle(id);
         } catch (VehicleDoesNotExists e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
         }
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok("Activated");
     }
 
+    //DONE
     @PutMapping(path = "/deactive/{id}")
     public ResponseEntity<?> deactivateVehicle(@PathVariable Long id) {
         try {
-            vehicleService.activateVehicle(id);
+            vehicleService.deactivateVehicle(id);
         } catch (VehicleDoesNotExists e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
         }
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok("Deactivated");
     }
 
-//    @GetMapping(path = "confusing")
-//    public ResponseEntity<?> getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser() {
-//        List<VehicleDTO> vehicleDTOS = new ArrayList<>();
-//        vehicleDTOS = vehicleService.getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser();
-//        return ResponseEntity.ok(vehicleDTOS);
-//    }
+    //DONE
+    @GetMapping(path = "confusing")
+    public ResponseEntity<?> getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser() {
+        String plates;
+        plates = vehicleService.getLicensePlateOfVehiclesThatAreActiveAndBelongsToDeactivatedUser();
+        return ResponseEntity.ok(plates);
+    }
 }

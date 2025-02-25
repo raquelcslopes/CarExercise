@@ -1,7 +1,9 @@
 package exercise_vik_CarExercise.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 
+@Builder
 @Entity(name = "vehicles")
 @Table
 public class VehicleEntity {

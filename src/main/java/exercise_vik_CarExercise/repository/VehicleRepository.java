@@ -14,7 +14,5 @@ public interface VehicleRepository extends JpaRepository<VehicleEntity, Long> {
 
     Optional<List<VehicleEntity>> findByUserIn(Optional<List<UserEntity>> users);
 
-    //Optional<List<VehicleEntity>> findByVehicleIn(Optional<List<UserEntity>> users);
-
 
 }

@@ -3,10 +3,13 @@ package exercise_vik_CarExercise.controller;
 import exercise_vik_CarExercise.exceptions.AccountDoesNotExistException;
 import exercise_vik_CarExercise.exceptions.AlreadyExistsException;
 import exercise_vik_CarExercise.model.UserDTO;
+import exercise_vik_CarExercise.model.UserNameDTO;
 import exercise_vik_CarExercise.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,55 +23,62 @@ public class UserController {
 
     //DONE
     @PostMapping
-    public ResponseEntity<?> createAccount(@RequestBody UserDTO dto) {
+    public ResponseEntity<?> createAccount(@Valid @RequestBody UserDTO dto, BindingResult bindingResult) {
         UserDTO userDTO;
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         try {
             userDTO = this.userService.createAccount(dto);
         } catch (AlreadyExistsException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.getMessage());
         }
         return ResponseEntity.ok(userDTO);
     }
 
-    //TODO
+    //DONE
     @PatchMapping(path = "active/{id}")
     public ResponseEntity<?> activateAccount(@PathVariable Long id) {
         try {
             this.userService.activateAccount(id);
         } catch (AccountDoesNotExistException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error);
+            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error.getMessage());
         }
         return ResponseEntity.status((HttpStatus.OK)).body("activated");
     }
 
-    //TODO
+    //DONE
     @PatchMapping(path = "deactive/{id}")
     public ResponseEntity<?> deactivateAccount(@PathVariable Long id) {
         try {
             this.userService.deactivateAccount(id);
         } catch (AlreadyExistsException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error);
+            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error.getMessage());
         }
         return ResponseEntity.status((HttpStatus.OK)).body("deactivated");
     }
 
-    //TODO
+    //DONE
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
         try {
             this.userService.deleteAccount(id);
         } catch (AccountDoesNotExistException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error);
+            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error.getMessage());
         }
         return ResponseEntity.status((HttpStatus.OK)).body("deleted");
     }
 
+    //DONE
     @PutMapping(path = "firstName/lastName/{id}")
-    public ResponseEntity<?> updateFirstNameAndLastName(@PathVariable Long id, @RequestBody UserDTO dto) {
+    public ResponseEntity<?> updateFirstNameAndLastName(@PathVariable Long id, @Valid @RequestBody UserNameDTO dto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         try {
             this.userService.updateFirstNameAndLastName(id, dto);
         } catch (AccountDoesNotExistException e) {
@@ -78,18 +88,23 @@ public class UserController {
         return ResponseEntity.status((HttpStatus.OK)).body("data updated");
     }
 
+    //DONE
     @PutMapping(path = "details/{id}")
-    public ResponseEntity<?> updateFullAcccountDetails(@PathVariable Long id, @RequestBody UserDTO dto) {
+    public ResponseEntity<?> updateFullAccountDetails(@PathVariable Long id, @Valid @RequestBody UserDTO dto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        UserDTO userDto;
         try {
-            this.userService.updateFullAccountDetails(id, dto);
+            userDto = this.userService.updateFullAccountDetails(id, dto);
         } catch (AccountDoesNotExistException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error);
+            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error.getMessage());
         }
-        return ResponseEntity.status((HttpStatus.OK)).body("data updated");
+        return ResponseEntity.ok(userDto);
     }
 
-
+    //DONE
     @GetMapping(path = "accounts")
     public ResponseEntity<?> getDeactivatedAccounts() {
         List<UserDTO> users;
@@ -97,11 +112,12 @@ public class UserController {
             users = userService.getDeactivatedAccounts();
         } catch (AccountDoesNotExistException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body(error);
+            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body(error.getMessage());
         }
         return ResponseEntity.ok(users);
     }
 
+    //DONE
     @GetMapping(path = "inactive/vehicles")
     public ResponseEntity<?> getDeactivatedAccountsWithActiveVehicles() {
         List<UserDTO> users = userService.getDeactivatedAccountsWithActiveVehicles();
@@ -109,14 +125,15 @@ public class UserController {
 
     }
 
+    //DONE
     @GetMapping(path = "details")
     public ResponseEntity<?> getFirstNameAndLastNameAccountsThatAreDeactivated() {
-        List<UserDTO> users;
+        List<UserNameDTO> users;
         try {
             users = userService.getFirstNameAndLastNameAccountsThatAreDeactivated();
         } catch (AccountDoesNotExistException e) {
             Error error = new Error(e.getMessage());
-            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body(error);
+            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body(error.getMessage());
         }
         return ResponseEntity.ok(users);
     }

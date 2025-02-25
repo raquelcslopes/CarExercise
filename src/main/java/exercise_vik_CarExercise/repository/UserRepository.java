@@ -14,7 +14,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<List<UserEntity>> findByIsActive(boolean active);
 
-    //List<UserEntity> findByFirstNameAndLastName();
-
 
 }
