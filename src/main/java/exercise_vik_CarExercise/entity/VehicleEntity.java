@@ -1,8 +1,12 @@
 package exercise_vik_CarExercise.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity(name = "vehicles")
 @Table
@@ -19,6 +23,12 @@ public class VehicleEntity {
 
     @ManyToOne
     private UserEntity user;
+
+    public VehicleEntity(Long id, boolean isActive, String plate) {
+        this.id = id;
+        this.isActive = isActive;
+        this.plate = plate;
+    }
 
     public Long getId() {
         return id;

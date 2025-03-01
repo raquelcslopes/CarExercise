@@ -17,4 +17,9 @@ public class UserNameConverter {
                 .build();
 
     }
+
+    public static void setFirstNameAndLastNameDto(UserEntity user, UserNameDTO dto) {
+        user.setLastName(dto.getLastName());
+        user.setFirstName(dto.getFirstName());
+    }
 }

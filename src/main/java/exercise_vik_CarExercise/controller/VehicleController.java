@@ -1,7 +1,7 @@
 package exercise_vik_CarExercise.controller;
 
 import exercise_vik_CarExercise.exceptions.AccountDoesNotExistException;
-import exercise_vik_CarExercise.exceptions.VehicleAlreadyExistException;
+import exercise_vik_CarExercise.exceptions.VehicleAssociatedToAccountException;
 import exercise_vik_CarExercise.exceptions.VehicleDoesNotExists;
 import exercise_vik_CarExercise.model.VehicleDTO;
 import exercise_vik_CarExercise.service.VehicleService;
@@ -19,7 +19,7 @@ public class VehicleController {
     @Autowired
     VehicleService vehicleService;
 
-    //DONE
+    //DONE & CHECK
     @PostMapping
     public ResponseEntity<?> createVehicle(@Valid @RequestBody VehicleDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -27,14 +27,14 @@ public class VehicleController {
         }
         try {
             this.vehicleService.createVehicle(dto);
-        } catch (VehicleAlreadyExistException e) {
+        } catch (VehicleAssociatedToAccountException e) {
             Error error = new Error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Already exists");
         }
         return ResponseEntity.status(HttpStatus.OK).body("Car created");
     }
 
-    //DONE
+    //DONE & CHECK
     @PutMapping(path = "{userId}/associate/account/{vehicleId}")
     public ResponseEntity<?> associateVehicleToAccount(@PathVariable Long userId, @PathVariable Long vehicleId) {
         try {
@@ -46,7 +46,7 @@ public class VehicleController {
         return ResponseEntity.ok(null);
     }
 
-    //DONE
+    //DONE & CHECK
     @PutMapping(path = "{id}")
     public ResponseEntity<?> activateVehicle(@PathVariable Long id) {
         try {
@@ -59,7 +59,7 @@ public class VehicleController {
     }
 
     //DONE
-    @PutMapping(path = "/deactive/{id}")
+    @PatchMapping(path = "/deactive/{id}")
     public ResponseEntity<?> deactivateVehicle(@PathVariable Long id) {
         try {
             vehicleService.deactivateVehicle(id);

@@ -3,7 +3,7 @@ package exercise_vik_CarExercise.service;
 import exercise_vik_CarExercise.entity.UserEntity;
 import exercise_vik_CarExercise.entity.VehicleEntity;
 import exercise_vik_CarExercise.exceptions.AccountDoesNotExistException;
-import exercise_vik_CarExercise.exceptions.VehicleAlreadyExistException;
+import exercise_vik_CarExercise.exceptions.VehicleAssociatedToAccountException;
 import exercise_vik_CarExercise.exceptions.VehicleDoesNotExists;
 import exercise_vik_CarExercise.model.VehicleConverter;
 import exercise_vik_CarExercise.model.VehicleDTO;
@@ -25,11 +25,11 @@ public class VehicleService {
         this.userRepo = userRepo;
     }
 
-    public void createVehicle(VehicleDTO dto) throws VehicleAlreadyExistException {
+    public void createVehicle(VehicleDTO dto) throws VehicleAssociatedToAccountException {
         Optional<VehicleEntity> vehicle = vehicleRepo.findByPlate(dto.getPlate());
 
         if (vehicle.isPresent()) {
-            throw new VehicleAlreadyExistException("This vehicle already exists");
+            throw new VehicleAssociatedToAccountException("This vehicle already exists");
         }
 
         VehicleEntity vehicleEntity = VehicleConverter.fromVehicleDtoToVehicleEntity(dto);
