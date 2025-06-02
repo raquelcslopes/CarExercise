@@ -126,6 +126,7 @@ public class UserService {
 
         if (user.getNif().length() != 9) {
             throw new NotValidException("Field not valid");
+
         }
 
         //TODO is active isn't a boolean
