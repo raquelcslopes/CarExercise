@@ -1,6 +1,7 @@
 package exercise_vik_CarExercise.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import exercise_vik_CarExercise.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -15,4 +16,6 @@ public class VehicleDTO {
 
     @NotBlank(message = "Must have license plate")
     public String plate;
+
+    public UserEntity user;
 }

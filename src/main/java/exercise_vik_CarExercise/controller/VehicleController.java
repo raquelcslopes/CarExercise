@@ -1,11 +1,11 @@
 package exercise_vik_CarExercise.controller;
 
-import exercise_vik_CarExercise.exceptions.AccountDoesNotExistException;
-import exercise_vik_CarExercise.exceptions.VehicleAssociatedToAccountException;
-import exercise_vik_CarExercise.exceptions.VehicleDoesNotExists;
+import exercise_vik_CarExercise.exceptions.*;
 import exercise_vik_CarExercise.model.VehicleDTO;
 import exercise_vik_CarExercise.service.VehicleService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +19,8 @@ public class VehicleController {
     @Autowired
     VehicleService vehicleService;
 
+    Logger logger = LoggerFactory.getLogger(UserController.class);
+
     //DONE & CHECK
     @PostMapping
     public ResponseEntity<?> createVehicle(@Valid @RequestBody VehicleDTO dto, BindingResult bindingResult) {
@@ -27,7 +29,7 @@ public class VehicleController {
         }
         try {
             this.vehicleService.createVehicle(dto);
-        } catch (VehicleAssociatedToAccountException e) {
+        } catch (VehicleAssociatedToAccountException | NeedToFillAllTheFieldsException | NotValidException e) {
             Error error = new Error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Already exists");
         }
@@ -53,6 +55,7 @@ public class VehicleController {
             vehicleService.activateVehicle(id);
         } catch (VehicleDoesNotExists e) {
             Error error = new Error(e.getMessage());
+            logger.info(e.getMessage() + " message from log");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error.getMessage());
         }
         return ResponseEntity.ok("Activated");

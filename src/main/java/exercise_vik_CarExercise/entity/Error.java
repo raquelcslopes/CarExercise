@@ -1,17 +1,14 @@
 package exercise_vik_CarExercise.entity;
 
+import lombok.*;
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Error {
     private String message;
-
-    public Error(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    private String method;
+    private String path;
 }

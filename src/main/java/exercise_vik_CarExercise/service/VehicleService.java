@@ -2,9 +2,7 @@ package exercise_vik_CarExercise.service;
 
 import exercise_vik_CarExercise.entity.UserEntity;
 import exercise_vik_CarExercise.entity.VehicleEntity;
-import exercise_vik_CarExercise.exceptions.AccountDoesNotExistException;
-import exercise_vik_CarExercise.exceptions.VehicleAssociatedToAccountException;
-import exercise_vik_CarExercise.exceptions.VehicleDoesNotExists;
+import exercise_vik_CarExercise.exceptions.*;
 import exercise_vik_CarExercise.model.VehicleConverter;
 import exercise_vik_CarExercise.model.VehicleDTO;
 import exercise_vik_CarExercise.repository.UserRepository;
@@ -25,7 +23,7 @@ public class VehicleService {
         this.userRepo = userRepo;
     }
 
-    public void createVehicle(VehicleDTO dto) throws VehicleAssociatedToAccountException {
+    public VehicleDTO createVehicle(VehicleDTO dto) throws VehicleAssociatedToAccountException, NotValidException {
         Optional<VehicleEntity> vehicle = vehicleRepo.findByPlate(dto.getPlate());
 
         if (vehicle.isPresent()) {
@@ -34,7 +32,20 @@ public class VehicleService {
 
         VehicleEntity vehicleEntity = VehicleConverter.fromVehicleDtoToVehicleEntity(dto);
 
+        if (vehicleEntity.getPlate().equals(null)) {
+            throw new NeedToFillAllTheFieldsException("Fill all the fields please");
+        }
+
+        if (!vehicleEntity.getPlate().equals("[A-Z]{2}-\\d{2}-[A-Z]{2}")) {
+            throw new NotValidException("Plate not valid");
+        }
+
+        if (vehicleEntity.getPlate().length() != 8) {
+            throw new NotValidException("Plate not valid");
+        }
+
         vehicleRepo.save(vehicleEntity);
+        return dto;
     }
 
     public void associateVehicleToAccount(Long userId, Long vehicleId) throws VehicleDoesNotExists, AccountDoesNotExistException {
@@ -52,6 +63,11 @@ public class VehicleService {
 
         VehicleEntity vehicle = vehicles.get();
         UserEntity user = users.get();
+
+        if (vehicle.getUser().equals(user)) {
+            throw new VehicleAssociatedToAccountException("Already has an account associated");
+        }
+
         vehicle.setUser(user);
         vehicleRepo.save(vehicle);
     }

@@ -28,6 +28,14 @@ public class UserEntity {
 
     @Column(name = "NIF", unique = true)
     private String nif;
+
+    @Column(name = "email", unique = true)
+    private String email;
+
+    @Column(name = "password")
+    private String password;
+
+
     @OneToMany(
             mappedBy = "user"
     )

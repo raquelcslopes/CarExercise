@@ -7,6 +7,7 @@ public class VehicleConverter {
         return VehicleDTO.builder()
                 .plate(vehicle.getPlate())
                 .active(vehicle.getUser().isActive())
+                .user(vehicle.getUser())
                 .build();
     }
 
@@ -14,6 +15,7 @@ public class VehicleConverter {
         return VehicleEntity.builder()
                 .plate(dto.getPlate())
                 .isActive(dto.getActive())
+                .user(dto.getUser())
                 .build();
 
     }

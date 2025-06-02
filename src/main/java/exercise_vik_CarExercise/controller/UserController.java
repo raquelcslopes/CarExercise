@@ -5,6 +5,8 @@ import exercise_vik_CarExercise.model.UserDTO;
 import exercise_vik_CarExercise.model.UserNameDTO;
 import exercise_vik_CarExercise.service.UserService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    Logger logger = LoggerFactory.getLogger(UserController.class);
+
+
     //DONE & CHECK
     @PostMapping
     public ResponseEntity<?> createAccount(@Valid @RequestBody UserDTO dto, BindingResult bindingResult) {
@@ -31,6 +36,7 @@ public class UserController {
             userDTO = this.userService.createAccount(dto);
         } catch (AlreadyExistsException e) {
             Error error = new Error(e.getMessage());
+            logger.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.getMessage());
         }
         return ResponseEntity.ok(userDTO);
@@ -65,8 +71,9 @@ public class UserController {
     public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
         try {
             this.userService.deleteAccount(id);
-        } catch (AccountDoesNotExistException | VehicleAssociatedToAccountException e) {
+        } catch (VehicleAssociatedToAccountException e) {
             Error error = new Error(e.getMessage());
+            logger.info(e.getMessage() + " message from log");
             return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body(error.getMessage());
         }
         return ResponseEntity.status((HttpStatus.OK)).body("deleted");
@@ -107,12 +114,7 @@ public class UserController {
     @GetMapping(path = "accounts")
     public ResponseEntity<?> getDeactivatedAccounts() {
         List<UserDTO> users;
-        try {
-            users = userService.getDeactivatedAccounts();
-        } catch (AccountDoesNotExistException e) {
-            Error error = new Error(e.getMessage());
-            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body(error.getMessage());
-        }
+        users = userService.getDeactivatedAccounts();
         return ResponseEntity.ok(users);
     }
 
@@ -132,6 +134,7 @@ public class UserController {
             users = userService.getFirstNameAndLastNameAccountsThatAreDeactivated();
         } catch (AccountDoesNotExistException e) {
             Error error = new Error(e.getMessage());
+            logger.info(e.getMessage() + " message from log");
             return ResponseEntity.status((HttpStatus.NOT_FOUND)).body(error.getMessage());
         }
         return ResponseEntity.ok(users);

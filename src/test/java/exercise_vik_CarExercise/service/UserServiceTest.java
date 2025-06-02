@@ -64,6 +64,7 @@ class UserServiceTest {
                 .lastName("Lopes")
                 .id(1L)
                 .build();
+
         UserDTO user = userService.createAccount(userDTO);
 
         assertEquals(userEntity.getId(), user.getId());
@@ -194,5 +195,10 @@ class UserServiceTest {
                 .build();
 
         assertThrows(NotValidException.class, () -> userService.updateFullAccountDetails(1L, dto));
+    }
+
+    @Test
+    void when_ActivatedAccount_then_returnActiveAccount() {
+        
     }
 }
